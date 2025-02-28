@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Owners {
+  ownerId String @id @default(uuid())
+  email String @unique
+  clerkId String @unique
+
+  projects Projects[]
+}
+
+model Projects {
+  projectId String @id @default(uuid())
+  ownerId String @unique
+  owner Owners @relation(fields: [ownerId], references: [ownerId])
+
+  APIKEY String
+  members Members[]
+}
+
+model Members {
+  memberId String @id @default(uuid())
+  developerUserId String @unique
+
+  projectId String
+  project Projects @relation(fields: [projectId], references: [projectId])
+
+  notifications String[] // Store notification IDs as an array of strings
+}
+
+model Notifications {
+  notificationId String @id @default(uuid())
+  content String
+  buttonText String?
+  buttonUrl String?
+
+  memberIds String[] // Array of member/user IDs to whom this notification is being sent
+}
